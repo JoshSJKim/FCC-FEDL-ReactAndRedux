@@ -15,7 +15,7 @@
 - `react-redux` package is required to pass Redux `state` and `dispatch` to React components as `props`.
 
 ```jsx
-class DislayMessages extends React.Component {
+class DisplayMessages extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -68,3 +68,23 @@ class DisplayMessages extends React.Component {
     }
 };
 ```
+
+- The above code is managing state locally because it defines a 'state' object within its 'constructor' method, which is specific to this component instance.
+
+```jsx
+render() {
+    const msg = this.state.messages.map((elem) => <li key={elem}>{elem}</li>);
+    return (
+        <div>
+            <h2>Type in a new Message:</h2>
+            <form onSubmit={this.submitMessage}>
+                <input value={this.state.input} onChange={this.handleChange} />
+                <button type="submit">Add Message</button>
+            </form>
+            <ul>{msg}</ul>
+        </div>
+    );
+}
+```
+
+- by wrapping the `input` and `button` elements in a `<form>` element with an `onSubmit` handler that calls the `submitMessage` method, the message could be submitted by either clicking the 'Add Message' button, or simply by pressing the 'Enter' key.
