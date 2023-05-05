@@ -48,7 +48,7 @@ class DisplayMessages extends React.Component {
         });
     }
     submitMessage(event) {
-        const messageArr = [...this.state.message, this.state.input];
+        const messageArr = [...this.state.message, this.state.input];  // Or state.messages.concat(state.input)
         this.setState({
             input: '',
             messages: messageArr
@@ -56,7 +56,7 @@ class DisplayMessages extends React.Component {
         event.preventDefault();
     }
     render() {
-        const msg = this.state.messages.map((elem) => <li key={elem}>{elem}</li>);
+        const msg = this.state.messages.map((elem, index) => <li key={index}>{elem}</li>);
         return (
             <div>
                 <h2>Type in a new Message:</h2>
@@ -97,19 +97,117 @@ const ADD = 'ADD';
 
 const addMessage = (message) => {
     return {
-        type: 'ADD',
+        type: ADD,
         message: message
     }
 };
 
 const messageReducer = (state = [], action) => {
     switch(action.type) {
-        case 'ADD':
-            return state.concat(action.message);
+        case ADD:
+            return state.concat(action.message); // Or [...state, action.message]
         default: 
             return state;
     }
 };
 
 const store = Redux.createStore(messageReducer);
+```
+
+## Use Provider to Connect Redux to React
+
+- React requires access to the Redux store and the actions it needs to dispatch updates.
+- React Redux provides a small API with two key features.
+- First is the `Provider`, which is a wrapper component from React Redux that wraps the React app.
+- It allows access to the Redux `store` and `dispatch` functions throughout the component tree.
+- It takes two props: the Redux `store` and the child components of the app.
+
+```jsx
+<Provider store={store}>
+    <App/>
+</Provider>
+```
+
+```jsx
+// Redux:
+
+const ADD = 'ADD';              // action type
+
+const addMessage = (message) => {   // action creator
+    return {
+        type: ADD,
+        message: message
+    }
+};
+
+const messageReducer = (state = [], action) => {
+    switch (action.type) {
+        case ADD:
+            return [...state, action.message];
+        default: 
+            return state;
+    }
+};
+
+const store = Redux.createStore(messageReducer);
+
+// React:
+
+class DisplayMessages extends React.Component {
+    constructor(props) {
+        super(props) ;
+        this.state = {
+            input: '', 
+            messages: []
+        }
+        this.handleChange = this.handleChange.bind(this);
+        this submitMessage = this.submitMessage.bind(this);
+    }
+    handleChange(event) {
+        this.setState({
+            input: event.target.value
+        });
+    }
+    submitMessage(event) {
+        const currentMessage = [...this.state.message, this.state.input];
+        this.setState((state) => {
+            return {
+                input: '', 
+                messages: currentMessage
+            };
+        });
+    }
+    render() {
+        const msg = {this.state.messages.map((message, index) => {
+            return(
+                <li key={index}>{message}</li>
+            )
+        })};
+        return(
+            <div>
+                <h2>Type in a new Message:</h2>
+                <input value={this.state.input} onChange={this.handleChange} />
+                <br />
+                <button onClick={this.submitMessage}>Add Message</button>
+                <ul>{msg}</ul>
+            </div>
+        );
+    }
+};
+
+const Provider = ReactRedux.Provider; 
+// Note: React Redux is available as a global variable, which means the Provider can be accessed using a dot notation, and assigned to a const variable, as shown above.
+
+class AppWrapper extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        return{
+            <Provider store={store}>
+                <DisplayMessages />
+            </Provider>
+        };
+    }
+};
 ```
