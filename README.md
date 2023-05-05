@@ -211,3 +211,24 @@ class AppWrapper extends React.Component {
     }
 };
 ```
+
+## Map State to Props
+
+- The `Provider` component allows the provision of `state` and `dispatch` to React components, but the exact state and actions must be specified.
+- It ensures that each component only has access to the state it needs.
+- Create two functions to accomplish this: `mapStateToProps()` and `mapDispatchToProps()`
+
+- In these functions, declare which pieces of state are accessible and which action creators will be available for dispatch.
+
+```jsx
+const state = [];
+
+const mapStateToProps = (state) => {
+    return {
+        messages: state
+    }
+};
+```
+
+- function `mapStateToProps()` takes `state` as an argument and returns an object that maps the state passed to specific property names. (in the case above, state is passed and set to the property 'messages')
+- These properties will become accessible to the components via `props`.
