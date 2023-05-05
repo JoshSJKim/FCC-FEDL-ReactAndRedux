@@ -88,3 +88,28 @@ render() {
 ```
 
 - by wrapping the `input` and `button` elements in a `<form>` element with an `onSubmit` handler that calls the `submitMessage` method, the message could be submitted by either clicking the 'Add Message' button, or simply by pressing the 'Enter' key.
+
+## Extract State Logic to Redux
+
+```jsx
+
+const ADD = 'ADD';
+
+const addMessage = (message) => {
+    return {
+        type: 'ADD',
+        message: message
+    }
+};
+
+const messageReducer = (state = [], action) => {
+    switch(action.type) {
+        case 'ADD':
+            return state.concat(action.message);
+        default: 
+            return state;
+    }
+};
+
+const store = Redux.createStore(messageReducer);
+```
