@@ -260,3 +260,50 @@ const mapDispatchToProps = (dispatch) => {
 
 ## Connect Redux to React
 
+- Use `connect` method from React Redux to utilize `mapStateToProps()` and `mapDispatchToProps()` to map `state` and `dispatch` to the `props` of one of the React components.
+- The `connect` method takes two optional arguments: `mapStateToProps()` and `mapDispatchToProps()`.
+- They are optional because a component may only need access to either `state` or `dispatch`.
+
+- To use the `connect` method, pass in the functions as arguments, and immediately call the result with the component.
+- The syntax is a bit unusual
+
+`connect(mapStateToProps, mapDispatchToProps)(MyComponent)`
+
+- Note: In order to omit either of the arguments, pass `null` in its place.
+
+```jsx
+const addMessage = (message) => {
+    return {
+        type: 'ADD',
+        message: message
+    }
+};
+
+const mapStateToProps = (state) => {
+    return {
+        messages: state
+    }
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        submitNewMessage: (message) => {
+            dispatch(addMessage(message));
+        }
+    }
+};
+
+class Presentational extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        return <h3>This is a Presentational Component</h3>
+    }
+};
+
+const connect = ReactRedux.connect;
+
+const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(Presentational)
+```
+
