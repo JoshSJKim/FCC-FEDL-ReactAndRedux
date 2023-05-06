@@ -232,3 +232,31 @@ const mapStateToProps = (state) => {
 
 - function `mapStateToProps()` takes `state` as an argument and returns an object that maps the state passed to specific property names. (in the case above, state is passed and set to the property 'messages')
 - These properties will become accessible to the components via `props`.
+
+- Note: Behind the scenes, React Redux uses the `store.subscribe()` method to implement `mapStateToProps()`
+
+## Map Dispatch to Props
+
+- `mapDispatchToProps()` function is used to provide specific action creators to React components to allow dispatch actions against the Redux store.
+- Structure is similar to the `mapStateToProps()` function.
+- It returns an object that maps dispatch actions to property names, which become component `props`.
+- `dispatch` is passed as an argument, and it returns a function that calls `dispatch` with an action creator and any relevant action data for each property.
+- Note: Behind the scenes, React Redux is using Redux's `store.dispatch()` to conduct the dispatches with mapDispatchToProps.
+
+```jsx
+const addMessage = (message) => {
+    return {
+        type: 'ADD',
+        message: message
+    }
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        submitNewMessage: (message) => dispatch(addMessage(message))
+    };
+};
+```
+
+## Connect Redux to React
+
