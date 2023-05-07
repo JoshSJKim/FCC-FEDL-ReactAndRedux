@@ -362,9 +362,10 @@ class Presentational extends React.Component {
             return {
                 input: '', 
                 messages: state.messages.concat(currentMessage)
-            };
+            }
         });
     }
+    
     render() {
         const msg = this.state.message.map((message, index) => {
             return (
@@ -414,3 +415,111 @@ class AppWrapper extends React.Component {
     }
 };
 ```
+
+## Extract Local State into Redux
+
+- All Redux code is written so that Redux has control over the state management of the React messages app.
+- Now, extract the state management out of the `Presentational` component into Redux.
+- The code in the previous example has Redux connected, but state is handled locally in the `Presentational` component.
+
+```jsx
+
+// Redux:
+
+const ADD = 'ADD';
+
+const addMessage = (message) => {
+    return {
+        type: ADD, 
+        message: message
+    }
+};
+
+const messageReducer = (state = [], action) => {
+    switch(action.type) {
+        case ADD:
+            return [...state, action.message];
+        default:
+            return state;
+    }
+};
+
+const store = Redux.createStore(messageReducer);
+
+// React:
+
+const Provider = ReactRedux.Provider;
+const connect = ReactRedux.connect;
+
+class Presentational extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            input: ''       // messages property is removed from the local state since it will be managed by Redux
+        }
+        this.handleChange = this.handleChange.bind(this);
+        this.submitMessage = this.submitMessage.bind(this);
+    }
+    handleChange(event) {
+        this.setState({
+            input: event.target.value
+        });
+    }
+    submitMessage() {
+        this.props.submitNewMessage(this.state.input) 
+        // submitNewMessage() will be dispatched from this.props, and pass the current message input from the local state (this.state.input) as an argument
+        // This will ensure that the Presentational component renders messages from the Redux store.
+        this.setState({
+            input: '' // Dispatching submitMessage() on the Presentational component will update Redux store and clear the input in local state
+        });
+    }
+    render() {
+        const msg = this.props.messages.map((message, index) => {
+            return (
+                <li key={index}>{message}</li>
+            )
+        });
+        return (
+            <div>
+                <h2>Type in a new Message:</h2>
+                <input value={this.state.input} onChange={this.handleChange} />
+                <br />
+                <button onClick={this.submitMessage}>Add Message</button>
+                <ul>{msg}</ul>
+            </div>
+        );
+    }
+};
+
+// React-Redux:
+
+const mapStateToProps = (state) => {
+    return {
+        messages: state
+    }
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        submitNewMessage: (message) => {
+            dispatch(addMessage(message))
+        }
+    }
+};
+
+const Container = connect(mapStateToProps, mapDispatchToProps)(Presentational);
+
+class AppWrapper extends React.Component {
+    // AppWrapper does not require a constructor or a call to 'super(props)' since it does not have any state or props of its own, and it does not define any methods that use the 'this' keyword.
+    render () {     
+        return (
+            <Provider store={store}>
+                <Container />
+            </Provider>
+        );
+    }
+};
+```
+
+- In the code above, Redux manages the state.
+- It also illustrates how a component may have local state. In other words, the component still tracks user in put locally in its own state.
